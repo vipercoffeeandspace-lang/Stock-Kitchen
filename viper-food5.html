@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viper Food</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-orange-50 p-4">
+
+<h1 class="text-2xl font-bold text-center text-orange-700 mb-6">🐍 Viper Food</h1>
+
+<div class="max-w-xl mx-auto space-y-4">
+
+<button onclick="selectCategory('นับทุกวัน')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับทุกวัน</button>
+<button onclick="selectCategory('นับวันจันทร์')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับวันจันทร์</button>
+<button onclick="selectCategory('นับวันอังคาร')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับวันอังคาร</button>
+<button onclick="selectCategory('นับวันพุธ')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับวันพุธ</button>
+<button onclick="selectCategory('นับวันพฤหัส')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับวันพฤหัส</button>
+<button onclick="selectCategory('นับวันศุกร์')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับวันศุกร์</button>
+<button onclick="selectCategory('นับวันเสาร์')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับวันเสาร์</button>
+<button onclick="selectCategory('นับวันอาทิตย์')" class="w-full bg-orange-500 text-white p-4 rounded-xl">นับวันอาทิตย์</button>
+
+</div>
+
+<div id="stock" class="max-w-xl mx-auto mt-6"></div>
+
+<script>
+
+const GOOGLE_SHEET_WEBAPP_URL = "YOUR_URL_HERE"; // 👈 ใส่ URL ตรงนี้
+
+const stockItems = {
+"นับทุกวัน": ["ใบกะเพรา","เนื้อทำข้าวหน้าเนื้อ","บะหมี่เหลือง","หมูยอ","โหระพา","ผักชีใบเลื่อย","ไข่"],
+"นับวันจันทร์": ["น้ำมันเนื้อ","เนยจืด","เนยเค็ม"],
+"นับวันอังคาร": ["ถั่วงอก","พริก","กระเทียม"],
+"นับวันพุธ": ["มันเจียว","เนื้อเจียว"],
+"นับวันพฤหัส": ["เนื้อสับ","ข้าวสาร"],
+"นับวันศุกร์": ["หมูตุ๋น","กล่องข้าว"],
+"นับวันเสาร์": ["ซอสพริก","น้ำตาล"],
+"นับวันอาทิตย์": ["ซอสกะเพรา","มาม่า"]
+};
+
+function selectCategory(cat){
+  const container = document.getElementById("stock");
+  let html = `<div class="bg-white p-4 rounded-xl shadow">
+  <h2 class="text-xl font-bold mb-4">${cat}</h2>`;
+
+  stockItems[cat].forEach(item=>{
+    html += `
+    <div class="flex justify-between border-b py-2">
+      <span>${item}</span>
+      <input type="number" id="${item}" class="border rounded w-20 text-center">
+    </div>`;
+  });
+
+  html += `
+    <button onclick="saveData('${cat}')" class="mt-4 w-full bg-green-500 text-white p-3 rounded-xl">
+      💾 บันทึก
+    </button>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+function saveData(category){
+  let data = [];
+
+  stockItems[category].forEach(item=>{
+    const value = document.getElementById(item).value;
+    if(value){
+      data.push({
+        item: item,
+        qty: value,
+        category: category
+      });
+    }
+  });
+
+  fetch(GOOGLE_SHEET_WEBAPP_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(res => res.text())
+  .then(res => {
+    alert("✅ บันทึกสำเร็จ!");
+  })
+  .catch(err => {
+    alert("❌ เกิดข้อผิดพลาด");
+  });
+}
+
+</script>
+
+</body>
+</html>
